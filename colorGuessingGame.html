@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Color Guessing Game</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+      }
+      .container {
+        max-width: 500px;
+        margin: 20px auto;
+      }
+      #colorBox {
+        width: 100px;
+        height: 100px;
+        margin: 20px auto;
+        border: 2px solid #000;
+        background-color: #fff;
+      }
+      .options {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .colorOption {
+        width: 60px;
+        height: 60px;
+        border: none;
+        cursor: pointer;
+      }
+      #newGameButton {
+        margin-top: 20px;
+        padding: 10px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1 data-testid="gameInstructions">Guess the correct color!</h1>
+      <div id="colorBox" data-testid="colorBox"></div>
+      <p id="gameStatus" data-testid="gameStatus"></p>
+      <p>Score: <span id="score" data-testid="score">0</span></p>
+      <div class="options" id="optionsContainer"></div>
+      <button id="newGameButton" data-testid="newGameButton">New Game</button>
+    </div>
+
+    <script>
+      const colors = ["red", "blue", "green", "yellow", "orange", "purple"];
+      let targetColor = "";
+      let score = 0;
+
+      function startGame(resetScore = false) {
+        if (resetScore) {
+          score = 0;
+          document.getElementById("score").textContent = score;
+        }
+        targetColor = colors[Math.floor(Math.random() * colors.length)];
+        document.getElementById("colorBox").style.backgroundColor = "#fff";
+        document.getElementById("gameStatus").textContent = "";
+        generateColorOptions();
+      }
+
+      function generateColorOptions() {
+        const optionsContainer = document.getElementById("optionsContainer");
+        optionsContainer.innerHTML = "";
+        colors.forEach((color) => {
+          const btn = document.createElement("button");
+          btn.classList.add("colorOption");
+          btn.style.backgroundColor = color;
+          btn.setAttribute("data-testid", "colorOption");
+          btn.onclick = () => checkGuess(color);
+          optionsContainer.appendChild(btn);
+        });
+      }
+
+      function checkGuess(selectedColor) {
+        if (selectedColor === targetColor) {
+          document.getElementById("gameStatus").textContent = "Correct!";
+          document.getElementById("colorBox").style.backgroundColor =
+            targetColor;
+          score++;
+          document.getElementById("score").textContent = score;
+          setTimeout(() => startGame(false), 1000);
+        } else {
+          document.getElementById("gameStatus").textContent =
+            "Wrong! Try again.";
+        }
+      }
+
+      document
+        .getElementById("newGameButton")
+        .addEventListener("click", () => startGame(true));
+      startGame();
+    </script>
+  </body>
+</html>
