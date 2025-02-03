@@ -19,6 +19,7 @@
         margin: 20px auto;
         border: 2px solid #000;
         background-color: #fff;
+        transition: background-color 0.5s ease-in-out;
       }
       .options {
         display: flex;
@@ -37,6 +38,43 @@
         padding: 10px;
         cursor: pointer;
         font-size: 16px;
+      }
+      .bounce {
+        animation: bounce 0.5s ease;
+      }
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+      .fade-out {
+        animation: fadeOut 0.5s ease-in-out;
+      }
+      @keyframes fadeOut {
+        0% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+      .celebrate {
+        animation: celebrate 0.5s ease-in-out;
+      }
+      @keyframes celebrate {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.2);
+        }
+        100% {
+          transform: scale(1);
+        }
       }
     </style>
   </head>
@@ -80,16 +118,25 @@
       }
 
       function checkGuess(selectedColor) {
+        const gameStatus = document.getElementById("gameStatus");
         if (selectedColor === targetColor) {
-          document.getElementById("gameStatus").textContent = "Correct!";
+          gameStatus.textContent = "Correct!";
+          gameStatus.classList.add("celebrate");
           document.getElementById("colorBox").style.backgroundColor =
             targetColor;
           score++;
           document.getElementById("score").textContent = score;
-          setTimeout(() => startGame(false), 1000);
+          setTimeout(() => {
+            gameStatus.classList.remove("celebrate");
+            startGame(false);
+          }, 1000);
         } else {
-          document.getElementById("gameStatus").textContent =
-            "Wrong! Try again.";
+          gameStatus.textContent = "Wrong! Try again.";
+          gameStatus.classList.remove("bounce");
+          void gameStatus.offsetWidth;
+          gameStatus.classList.add("bounce");
+          gameStatus.classList.add("fade-out");
+          setTimeout(() => gameStatus.classList.remove("fade-out"), 500);
         }
       }
 
