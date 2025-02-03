@@ -76,10 +76,19 @@
         transform: scale(1.1);
       }
 
+      #gameInstructions {
+        font-size: 18px;
+        margin: 5px;
+      }
+
       #gameStatus {
         font-size: 18px;
         font-weight: bold;
         margin: 5px;
+      }
+
+      #score {
+        margin-bottom: 20px;
       }
 
       #newGameButton {
@@ -95,14 +104,8 @@
         transition: background 0.3s ease-in-out;
       }
 
-      #score1 {
-        margin-bottom: 20px;
-      }
-
       #newGameButton:hover {
         background-color: #230838b6;
-
-        /* background-color: #0056b3; */
       }
 
       @keyframes bounce {
@@ -163,12 +166,12 @@
   </head>
   <body>
     <div class="container">
-      <h1>Guess the Correct Color! 🎨</h1>
-      <div id="colorBox">❓</div>
-      <p id="gameStatus"></p>
-      <p id="score1">Score: <span id="score">0</span></p>
+      <h1 data-testid="gameInstructions">Guess the Correct Color!</h1>
+      <div id="colorBox" data-testid="colorBox">❓</div>
+      <p id="gameStatus" data-testid="gameStatus"></p>
+      <p id="score">Score: <span data-testid="score">0</span></p>
       <div class="options" id="optionsContainer"></div>
-      <button id="newGameButton">New Game</button>
+      <button id="newGameButton" data-testid="newGameButton">New Game</button>
     </div>
 
     <script>
@@ -178,14 +181,7 @@
       const optionsContainer = document.getElementById("optionsContainer");
       const newGameButton = document.getElementById("newGameButton");
 
-      const colors = [
-        { color: "red", emoji: "😀" },
-        { color: "blue", emoji: "😃" },
-        { color: "green", emoji: "😁" },
-        { color: "yellow", emoji: "😆" },
-        { color: "orange", emoji: "😅" },
-        { color: "purple", emoji: "😂" },
-      ];
+      const colors = ["red", "blue", "green", "yellow", "orange", "purple"];
 
       let targetColor = "";
       let score = 0;
@@ -197,20 +193,20 @@
         }
 
         const randomColor = colors[Math.floor(Math.random() * colors.length)];
-        targetColor = randomColor.color;
+        targetColor = randomColor;
         colorBox.style.backgroundColor = "#fff";
-        colorBox.textContent = randomColor.emoji;
+        colorBox.textContent = "❓";
         gameStatus.textContent = "";
         generateColorOptions();
       }
 
       function generateColorOptions() {
         optionsContainer.innerHTML = "";
-        colors.forEach(({ color, emoji }) => {
+        colors.forEach((color) => {
           const btn = document.createElement("button");
           btn.classList.add("colorOption");
           btn.style.backgroundColor = color;
-          btn.textContent = emoji;
+          btn.setAttribute("data-testid", "colorOption");
           btn.onclick = () => checkGuess(color);
           optionsContainer.appendChild(btn);
         });
