@@ -5,43 +5,98 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Color Guessing Game</title>
     <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
       body {
         font-family: Arial, sans-serif;
         text-align: center;
+        background-color: #f4f4f4;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
+
       .container {
-        max-width: 500px;
-        margin: 20px auto;
+        max-width: 600px;
+        width: 90%;
+        padding: 20px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
       }
+
+      h1 {
+        font-size: 22px;
+        color: #333;
+      }
+
       #colorBox {
-        width: 100px;
-        height: 100px;
-        margin: 20px auto;
-        border: 2px solid #000;
-        background-color: #fff;
+        width: 120px;
+        height: 120px;
+        margin: 10px 0;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+        font-weight: bold;
         transition: background-color 0.5s ease-in-out;
       }
+
       .options {
         display: flex;
+        flex-wrap: wrap;
         justify-content: center;
         gap: 10px;
-        flex-wrap: wrap;
       }
+
       .colorOption {
-        width: 60px;
-        height: 60px;
+        width: 80px;
+        height: 80px;
+        border-radius: 10px;
         border: none;
         cursor: pointer;
+        font-size: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s ease-in-out;
       }
+
+      .colorOption:hover {
+        transform: scale(1.1);
+      }
+
+      #gameStatus {
+        font-size: 18px;
+        font-weight: bold;
+        margin: 5px;
+      }
+
       #newGameButton {
-        margin-top: 20px;
+        margin-top: 15px;
         padding: 10px;
-        cursor: pointer;
         font-size: 16px;
+        cursor: pointer;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        transition: background 0.3s ease-in-out;
       }
-      .bounce {
-        animation: bounce 0.5s ease;
+
+      #newGameButton:hover {
+        background-color: #0056b3;
       }
+
       @keyframes bounce {
         0%,
         100% {
@@ -51,20 +106,15 @@
           transform: translateY(-10px);
         }
       }
-      .fade-out {
-        animation: fadeOut 0.5s ease-in-out;
+
+      .bounce {
+        animation: bounce 0.5s ease-in-out;
       }
-      @keyframes fadeOut {
-        0% {
-          opacity: 1;
-        }
-        100% {
-          opacity: 0;
-        }
-      }
+
       .celebrate {
         animation: celebrate 0.5s ease-in-out;
       }
+
       @keyframes celebrate {
         0% {
           transform: scale(1);
@@ -76,16 +126,41 @@
           transform: scale(1);
         }
       }
+
+      @media (max-width: 600px) {
+        body {
+          height: 100vh;
+          justify-content: center;
+        }
+
+        .container {
+          width: 95%;
+          height: 90vh;
+          justify-content: center;
+        }
+
+        .colorOption {
+          width: 70px;
+          height: 70px;
+          font-size: 30px;
+        }
+
+        #colorBox {
+          width: 100px;
+          height: 100px;
+          font-size: 30px;
+        }
+      }
     </style>
   </head>
   <body>
     <div class="container">
-      <h1 data-testid="gameInstructions">Guess the correct color!</h1>
-      <div id="colorBox" data-testid="colorBox"></div>
-      <p id="gameStatus" data-testid="gameStatus"></p>
-      <p>Score: <span id="score" data-testid="score">0</span></p>
+      <h1>Guess the Correct Color! 🎨</h1>
+      <div id="colorBox">❓</div>
+      <p id="gameStatus"></p>
+      <p>Score: <span id="score">0</span></p>
       <div class="options" id="optionsContainer"></div>
-      <button id="newGameButton" data-testid="newGameButton">New Game</button>
+      <button id="newGameButton">New Game</button>
     </div>
 
     <script>
@@ -95,7 +170,15 @@
       const optionsContainer = document.getElementById("optionsContainer");
       const newGameButton = document.getElementById("newGameButton");
 
-      const colors = ["red", "blue", "green", "yellow", "orange", "purple"];
+      const colors = [
+        { color: "red", emoji: "😀" },
+        { color: "blue", emoji: "😃" },
+        { color: "green", emoji: "😁" },
+        { color: "yellow", emoji: "😆" },
+        { color: "orange", emoji: "😅" },
+        { color: "purple", emoji: "😂" },
+      ];
+
       let targetColor = "";
       let score = 0;
 
@@ -104,19 +187,22 @@
           score = 0;
           scoreDisplay.textContent = score;
         }
-        targetColor = colors[Math.floor(Math.random() * colors.length)];
+
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+        targetColor = randomColor.color;
         colorBox.style.backgroundColor = "#fff";
+        colorBox.textContent = randomColor.emoji;
         gameStatus.textContent = "";
         generateColorOptions();
       }
 
       function generateColorOptions() {
         optionsContainer.innerHTML = "";
-        colors.forEach((color) => {
+        colors.forEach(({ color, emoji }) => {
           const btn = document.createElement("button");
           btn.classList.add("colorOption");
           btn.style.backgroundColor = color;
-          btn.setAttribute("data-testid", "colorOption");
+          btn.textContent = emoji;
           btn.onclick = () => checkGuess(color);
           optionsContainer.appendChild(btn);
         });
@@ -124,7 +210,7 @@
 
       function checkGuess(selectedColor) {
         if (selectedColor === targetColor) {
-          gameStatus.textContent = "Correct!";
+          gameStatus.textContent = "Correct! 🎉";
           gameStatus.classList.add("celebrate");
           colorBox.style.backgroundColor = targetColor;
           score++;
@@ -134,11 +220,9 @@
             startGame(false);
           }, 1000);
         } else {
-          gameStatus.textContent = "Wrong! Try again.";
-          gameStatus.classList.remove("bounce");
-          void gameStatus.offsetWidth;
-          gameStatus.classList.add("bounce", "fade-out");
-          setTimeout(() => gameStatus.classList.remove("fade-out"), 500);
+          gameStatus.textContent = "Wrong! Try again ❌";
+          gameStatus.classList.add("bounce");
+          setTimeout(() => gameStatus.classList.remove("bounce"), 500);
         }
       }
 
