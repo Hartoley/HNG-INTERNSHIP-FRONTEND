@@ -89,6 +89,12 @@
     </div>
 
     <script>
+      const colorBox = document.getElementById("colorBox");
+      const gameStatus = document.getElementById("gameStatus");
+      const scoreDisplay = document.getElementById("score");
+      const optionsContainer = document.getElementById("optionsContainer");
+      const newGameButton = document.getElementById("newGameButton");
+
       const colors = ["red", "blue", "green", "yellow", "orange", "purple"];
       let targetColor = "";
       let score = 0;
@@ -96,16 +102,15 @@
       function startGame(resetScore = false) {
         if (resetScore) {
           score = 0;
-          document.getElementById("score").textContent = score;
+          scoreDisplay.textContent = score;
         }
         targetColor = colors[Math.floor(Math.random() * colors.length)];
-        document.getElementById("colorBox").style.backgroundColor = "#fff";
-        document.getElementById("gameStatus").textContent = "";
+        colorBox.style.backgroundColor = "#fff";
+        gameStatus.textContent = "";
         generateColorOptions();
       }
 
       function generateColorOptions() {
-        const optionsContainer = document.getElementById("optionsContainer");
         optionsContainer.innerHTML = "";
         colors.forEach((color) => {
           const btn = document.createElement("button");
@@ -118,14 +123,12 @@
       }
 
       function checkGuess(selectedColor) {
-        const gameStatus = document.getElementById("gameStatus");
         if (selectedColor === targetColor) {
           gameStatus.textContent = "Correct!";
           gameStatus.classList.add("celebrate");
-          document.getElementById("colorBox").style.backgroundColor =
-            targetColor;
+          colorBox.style.backgroundColor = targetColor;
           score++;
-          document.getElementById("score").textContent = score;
+          scoreDisplay.textContent = score;
           setTimeout(() => {
             gameStatus.classList.remove("celebrate");
             startGame(false);
@@ -134,15 +137,13 @@
           gameStatus.textContent = "Wrong! Try again.";
           gameStatus.classList.remove("bounce");
           void gameStatus.offsetWidth;
-          gameStatus.classList.add("bounce");
-          gameStatus.classList.add("fade-out");
+          gameStatus.classList.add("bounce", "fade-out");
           setTimeout(() => gameStatus.classList.remove("fade-out"), 500);
         }
       }
 
-      document
-        .getElementById("newGameButton")
-        .addEventListener("click", () => startGame(true));
+      newGameButton.addEventListener("click", () => startGame(true));
+
       startGame();
     </script>
   </body>
