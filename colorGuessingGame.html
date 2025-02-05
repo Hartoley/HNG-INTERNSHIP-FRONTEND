@@ -47,9 +47,10 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 40px;
+        font-size: 18px;
         font-weight: bold;
-        transition: background-color 0.5s ease-in-out;
+        color: white;
+        text-shadow: 1px 1px 2px black;
       }
 
       .options {
@@ -65,20 +66,11 @@
         border-radius: 10px;
         border: none;
         cursor: pointer;
-        font-size: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
         transition: transform 0.2s ease-in-out;
       }
 
       .colorOption:hover {
         transform: scale(1.1);
-      }
-
-      #gameInstructions {
-        font-size: 18px;
-        margin: 5px;
       }
 
       #gameStatus {
@@ -88,6 +80,10 @@
       }
 
       #score {
+        margin-bottom: 10px;
+      }
+
+      #rounds {
         margin-bottom: 20px;
       }
 
@@ -96,7 +92,6 @@
         padding: 10px;
         font-size: 16px;
         cursor: pointer;
-        background-color: #007bff;
         background-color: #230838;
         color: white;
         border: none;
@@ -139,27 +134,14 @@
       }
 
       @media (max-width: 600px) {
-        body {
-          height: 100vh;
-          justify-content: center;
-        }
-
-        .container {
-          width: 95%;
-          height: 90vh;
-          justify-content: center;
-        }
-
         .colorOption {
           width: 70px;
           height: 70px;
-          font-size: 30px;
         }
 
         #colorBox {
           width: 100px;
           height: 100px;
-          font-size: 30px;
         }
       }
     </style>
@@ -167,9 +149,10 @@
   <body>
     <div class="container">
       <h1 data-testid="gameInstructions">Guess the Correct Color!</h1>
-      <div id="colorBox" data-testid="colorBox">❓</div>
+      <div id="colorBox" data-testid="colorBox">?</div>
       <p id="gameStatus" data-testid="gameStatus"></p>
       <p id="score">Score: <span data-testid="score">0</span></p>
+      <p id="rounds">Round: <span data-testid="rounds">0</span> / 10</p>
       <div class="options" id="optionsContainer"></div>
       <button id="newGameButton" data-testid="newGameButton">New Game</button>
     </div>
@@ -177,32 +160,57 @@
     <script>
       const colorBox = document.getElementById("colorBox");
       const gameStatus = document.getElementById("gameStatus");
-      const scoreDisplay = document.getElementById("score");
+      const scoreDisplay = document.querySelector("#score span");
+      const roundsDisplay = document.querySelector("#rounds span");
       const optionsContainer = document.getElementById("optionsContainer");
       const newGameButton = document.getElementById("newGameButton");
 
-      const colors = ["red", "blue", "green", "yellow", "orange", "purple"];
-
       let targetColor = "";
       let score = 0;
+      let round = 0;
+
+      function getRandomColor() {
+        const r = Math.floor(Math.random() * 256);
+        const g = Math.floor(Math.random() * 256);
+        const b = Math.floor(Math.random() * 256);
+        return `rgb(${r}, ${g}, ${b})`;
+      }
+
+      function generateShades(baseColor, count = 6) {
+        const shades = [baseColor];
+        let [r, g, b] = baseColor.match(/\d+/g).map(Number);
+
+        for (let i = 1; i < count; i++) {
+          let newR = Math.min(255, Math.max(0, r + (Math.random() * 50 - 25)));
+          let newG = Math.min(255, Math.max(0, g + (Math.random() * 50 - 25)));
+          let newB = Math.min(255, Math.max(0, b + (Math.random() * 50 - 25)));
+          shades.push(
+            `rgb(${Math.floor(newR)}, ${Math.floor(newG)}, ${Math.floor(newB)})`
+          );
+        }
+        return shades.sort(() => Math.random() - 0.5);
+      }
 
       function startGame(resetScore = false) {
         if (resetScore) {
           score = 0;
+          round = 0;
           scoreDisplay.textContent = score;
+          roundsDisplay.textContent = round;
         }
 
-        const randomColor = colors[Math.floor(Math.random() * colors.length)];
-        targetColor = randomColor;
-        colorBox.style.backgroundColor = "#fff";
-        colorBox.textContent = "❓";
+        targetColor = getRandomColor();
+        colorBox.style.backgroundColor = targetColor;
+        colorBox.textContent = targetColor;
         gameStatus.textContent = "";
         generateColorOptions();
       }
 
       function generateColorOptions() {
         optionsContainer.innerHTML = "";
-        colors.forEach((color) => {
+        const shades = generateShades(targetColor, 6);
+
+        shades.forEach((color) => {
           const btn = document.createElement("button");
           btn.classList.add("colorOption");
           btn.style.backgroundColor = color;
@@ -216,17 +224,26 @@
         if (selectedColor === targetColor) {
           gameStatus.textContent = "Correct! 🎉";
           gameStatus.classList.add("celebrate");
-          colorBox.style.backgroundColor = targetColor;
           score++;
           scoreDisplay.textContent = score;
-          setTimeout(() => {
-            gameStatus.classList.remove("celebrate");
-            startGame(false);
-          }, 1000);
         } else {
           gameStatus.textContent = "Wrong! Try again ❌";
           gameStatus.classList.add("bounce");
-          setTimeout(() => gameStatus.classList.remove("bounce"), 500);
+        }
+
+        round++;
+        roundsDisplay.textContent = round;
+
+        if (round === 10) {
+          setTimeout(() => {
+            alert(`Game Over! Your final score: ${score}`);
+            startGame(true);
+          }, 1000);
+        } else {
+          setTimeout(() => {
+            gameStatus.classList.remove("celebrate", "bounce");
+            startGame(false);
+          }, 1000);
         }
       }
 
