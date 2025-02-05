@@ -14,6 +14,10 @@
       body {
         font-family: Arial, sans-serif;
         text-align: center;
+        background-image: url("https://i.pinimg.com/736x/ac/6b/66/ac6b660c47615bcb542af4169b17e160.jpg");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
         background-color: #480b3c;
         height: 100vh;
         display: flex;
@@ -25,7 +29,8 @@
         max-width: 600px;
         width: 90%;
         padding: 20px;
-        background-color: #fc97e7;
+        background-color: #fc97e8f4;
+        /* background-color: #480b3ca8; */
         border-radius: 10px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         display: flex;
@@ -174,19 +179,23 @@
         const b = Math.floor(Math.random() * 256);
         return `rgb(${r}, ${g}, ${b})`;
       }
-
       function generateShades(baseColor, count = 6) {
         const shades = [baseColor];
         let [r, g, b] = baseColor.match(/\d+/g).map(Number);
 
-        for (let i = 1; i < count; i++) {
-          let newR = Math.min(255, Math.max(0, r + (Math.random() * 50 - 25)));
-          let newG = Math.min(255, Math.max(0, g + (Math.random() * 50 - 25)));
-          let newB = Math.min(255, Math.max(0, b + (Math.random() * 50 - 25)));
-          shades.push(
-            `rgb(${Math.floor(newR)}, ${Math.floor(newG)}, ${Math.floor(newB)})`
-          );
+        while (shades.length < count) {
+          let factor = Math.random() * 0.5 + 0.5;
+
+          let newR = Math.min(255, Math.max(0, Math.floor(r * factor)));
+          let newG = Math.min(255, Math.max(0, Math.floor(g * factor)));
+          let newB = Math.min(255, Math.max(0, Math.floor(b * factor)));
+
+          let newColor = `rgb(${newR}, ${newG}, ${newB})`;
+          if (!shades.includes(newColor)) {
+            shades.push(newColor);
+          }
         }
+
         return shades.sort(() => Math.random() - 0.5);
       }
 
