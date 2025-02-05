@@ -25,7 +25,6 @@
         max-width: 600px;
         width: 90%;
         padding: 20px;
-        background: white;
         background-color: #fc97e7;
         border-radius: 10px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
@@ -47,10 +46,6 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 18px;
-        font-weight: bold;
-        color: white;
-        text-shadow: 1px 1px 2px black;
       }
 
       .options {
@@ -66,11 +61,15 @@
         border-radius: 10px;
         border: none;
         cursor: pointer;
-        transition: transform 0.2s ease-in-out;
+        transition: transform 0.2s ease-in-out, border 0.3s ease-in-out;
       }
 
       .colorOption:hover {
         transform: scale(1.1);
+      }
+
+      .correctHighlight {
+        border: 5px solid #00ff00 !important; /* Green border for correct answer */
       }
 
       #gameStatus {
@@ -149,7 +148,7 @@
   <body>
     <div class="container">
       <h1 data-testid="gameInstructions">Guess the Correct Color!</h1>
-      <div id="colorBox" data-testid="colorBox">?</div>
+      <div id="colorBox" data-testid="colorBox"></div>
       <p id="gameStatus" data-testid="gameStatus"></p>
       <p id="score">Score: <span data-testid="score">0</span></p>
       <p id="rounds">Round: <span data-testid="rounds">0</span> / 10</p>
@@ -201,7 +200,6 @@
 
         targetColor = getRandomColor();
         colorBox.style.backgroundColor = targetColor;
-        colorBox.textContent = targetColor;
         gameStatus.textContent = "";
         generateColorOptions();
       }
@@ -215,36 +213,42 @@
           btn.classList.add("colorOption");
           btn.style.backgroundColor = color;
           btn.setAttribute("data-testid", "colorOption");
-          btn.onclick = () => checkGuess(color);
+          btn.onclick = () => checkGuess(color, btn);
           optionsContainer.appendChild(btn);
         });
       }
 
-      function checkGuess(selectedColor) {
+      function checkGuess(selectedColor, selectedButton) {
+        const buttons = document.querySelectorAll(".colorOption");
+        let correctButton = Array.from(buttons).find(
+          (btn) => btn.style.backgroundColor === targetColor
+        );
+
         if (selectedColor === targetColor) {
           gameStatus.textContent = "Correct! 🎉";
           gameStatus.classList.add("celebrate");
           score++;
           scoreDisplay.textContent = score;
         } else {
-          gameStatus.textContent = "Wrong! Try again ❌";
+          gameStatus.textContent = "Wrong! ❌";
           gameStatus.classList.add("bounce");
+          correctButton.classList.add("correctHighlight");
         }
 
         round++;
         roundsDisplay.textContent = round;
 
-        if (round === 10) {
-          setTimeout(() => {
+        setTimeout(() => {
+          gameStatus.classList.remove("celebrate", "bounce");
+          correctButton.classList.remove("correctHighlight");
+
+          if (round === 10) {
             alert(`Game Over! Your final score: ${score}`);
             startGame(true);
-          }, 1000);
-        } else {
-          setTimeout(() => {
-            gameStatus.classList.remove("celebrate", "bounce");
+          } else {
             startGame(false);
-          }, 1000);
-        }
+          }
+        }, 1000);
       }
 
       newGameButton.addEventListener("click", () => startGame(true));
